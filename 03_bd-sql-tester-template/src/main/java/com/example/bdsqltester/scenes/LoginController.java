@@ -2,24 +2,18 @@ package com.example.bdsqltester.scenes;
 
 import com.example.bdsqltester.HelloApplication;
 import com.example.bdsqltester.datasources.MainDataSource;
-import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
 import java.io.IOException;
 import java.sql.*;
 
-import com.example.bdsqltester.dtos.User;
 import javafx.scene.Parent;
-
-import javafx.scene.control.TextField;
-import javafx.stage.Stage;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -119,10 +113,10 @@ public class LoginController {
                     app.getPrimaryStage().setTitle("User View");
 
                     try {
-                        FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("user-view.fxml"));
+                        FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("siswa-view.fxml"));
                         Parent root = loader.load();
 
-                        UserController userController = loader.getController();
+                        SiswaController userController = loader.getController();
                         userController.setUserId(userId);
 
                         Scene scene = new Scene(root);
