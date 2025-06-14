@@ -73,7 +73,7 @@ public class LoginController {
 
     @FXML
     void initialize() {
-        selectRole.getItems().addAll("Admin", "User");
+        selectRole.getItems().addAll("Admin", "User", "Guru", "Wali");
         selectRole.setValue("User");
     }
 
@@ -88,46 +88,61 @@ public class LoginController {
         try {
             if (verifyCredentials(username, password, role)) {
                 HelloApplication app = HelloApplication.getApplicationInstance();
+                int userId = getUserIdByUsername(username);
 
-                // Load the correct view based on the role
-                if (role.equals("Admin")) {
-                    // Load the admin view
-                    app.getPrimaryStage().setTitle("Admin View");
-
-                    // Load fxml and set the scene
-                    FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("admin-view.fxml"));
-                    Scene scene = new Scene(loader.load());
-                    app.getPrimaryStage().setScene(scene);
-                } else {
-                    int userId = getUserIdByUsername(username);
-                    if (userId == -1) {
-                        Alert alert = new Alert(Alert.AlertType.ERROR);
-                        alert.setTitle("Login Error");
-                        alert.setHeaderText("User Not Found");
-                        alert.setContentText("Cannot find user ID in database.");
-                        alert.showAndWait();
-                        return;
-                    }
-
-                    // Load the user view
-                    app.getPrimaryStage().setTitle("User View");
-
-                    try {
-                        FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("siswa-view.fxml"));
-                        Parent root = loader.load();
-
-                        SiswaController userController = loader.getController();
-                        userController.setUserId(userId);
-
-                        Scene scene = new Scene(root);
-                        app.getPrimaryStage().setScene(scene);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-
-
+                if (userId == -1) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Login Error");
+                    alert.setHeaderText("User Not Found");
+                    alert.setContentText("Cannot find user ID in database.");
+                    alert.showAndWait();
+                    return;
                 }
+
+                FXMLLoader loader;
+                Parent root;
+                Scene scene;
+
+                switch (role) {
+                    case "Admin":
+                        loader = new FXMLLoader(HelloApplication.class.getResource("admin-view.fxml"));
+                        root = loader.load();
+                        scene = new Scene(root);
+                        app.getPrimaryStage().setTitle("Admin View");
+                        break;
+
+                    case "User":
+                        loader = new FXMLLoader(HelloApplication.class.getResource("siswa-view.fxml"));
+                        root = loader.load();
+                        SiswaController siswaController = loader.getController();
+                        siswaController.setUserId(userId);
+                        scene = new Scene(root);
+                        app.getPrimaryStage().setTitle("Siswa View");
+                        break;
+
+                    case "Guru":
+                        loader = new FXMLLoader(HelloApplication.class.getResource("guru-view.fxml"));
+                        root = loader.load();
+                        GuruController guruController = loader.getController();
+                        guruController.setUserId(userId); // create setter
+                        scene = new Scene(root);
+                        app.getPrimaryStage().setTitle("Guru View");
+                        break;
+
+                    case "Wali":
+                        loader = new FXMLLoader(HelloApplication.class.getResource("wali-view.fxml"));
+                        root = loader.load();
+                        WaliController waliController = loader.getController();
+                        waliController.setUserId(userId); // create setter
+                        scene = new Scene(root);
+                        app.getPrimaryStage().setTitle("Wali Kelas View");
+                        break;
+
+                    default:
+                        throw new IllegalArgumentException("Unknown role: " + role);
+                }
+
+                app.getPrimaryStage().setScene(scene);
 
             } else {
                 // Show an error message
