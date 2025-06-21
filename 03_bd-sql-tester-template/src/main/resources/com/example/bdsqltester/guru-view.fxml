@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<VBox spacing="10" xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.bdsqltester.scenes.GuruController">
+    <Label text="Jadwal Mengajar"/>
+    <TableView fx:id="jadwalTable" prefHeight="200"/>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.example.bdsqltester.GuruView"
-            prefHeight="400.0" prefWidth="600.0">
-
-</AnchorPane>
+    <Label text="Input Nilai Ujian"/>
+    <HBox spacing="5">
+        <TextField fx:id="siswaIdField" promptText="ID Siswa"/>
+        <TextField fx:id="mapelIdField" promptText="ID Mapel"/>
+        <TextField fx:id="nilaiField" promptText="Nilai"/>
+        <Button text="Submit" fx:id="submitButton" onAction="#handleInputNilai"/>
+    </HBox>
+</VBox>
