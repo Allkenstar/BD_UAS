@@ -12,6 +12,6 @@ module com.example.bdsqltester {
     opens com.example.bdsqltester.datasources to javafx.fxml;
     exports com.example.bdsqltester.scenes;
     opens com.example.bdsqltester.scenes to javafx.fxml;
-    exports com.example.bdsqltester.scenes.admin;
-    opens com.example.bdsqltester.scenes.admin to javafx.fxml;
+//    exports com.example.bdsqltester.scenes.admin;
+//    opens com.example.bdsqltester.scenes.admin to javafx.fxml;
 }

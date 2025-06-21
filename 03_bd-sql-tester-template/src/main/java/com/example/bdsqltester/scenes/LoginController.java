@@ -73,8 +73,8 @@ public class LoginController {
 
     @FXML
     void initialize() {
-        selectRole.getItems().addAll("Admin", "User", "Guru", "Wali");
-        selectRole.setValue("User");
+        selectRole.getItems().addAll("admin", "user", "guru", "wali_kelas");
+        selectRole.setValue("user");
     }
 
     @FXML
@@ -104,14 +104,14 @@ public class LoginController {
                 Scene scene;
 
                 switch (role) {
-                    case "Admin":
+                    case "admin":
                         loader = new FXMLLoader(HelloApplication.class.getResource("admin-view.fxml"));
                         root = loader.load();
                         scene = new Scene(root);
                         app.getPrimaryStage().setTitle("Admin View");
                         break;
 
-                    case "User":
+                    case "user":
                         loader = new FXMLLoader(HelloApplication.class.getResource("siswa-view.fxml"));
                         root = loader.load();
                         SiswaController siswaController = loader.getController();
@@ -120,7 +120,7 @@ public class LoginController {
                         app.getPrimaryStage().setTitle("Siswa View");
                         break;
 
-                    case "Guru":
+                    case "guru":
                         loader = new FXMLLoader(HelloApplication.class.getResource("guru-view.fxml"));
                         root = loader.load();
                         GuruController guruController = loader.getController();
@@ -129,7 +129,7 @@ public class LoginController {
                         app.getPrimaryStage().setTitle("Guru View");
                         break;
 
-                    case "Wali":
+                    case "wali_kelas":
                         loader = new FXMLLoader(HelloApplication.class.getResource("wali-view.fxml"));
                         root = loader.load();
                         WaliController waliController = loader.getController();

@@ -16,396 +16,159 @@ import javafx.stage.Stage;
 import java.sql.*;
 import java.util.ArrayList;
 
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import java.time.LocalDate;
+import java.sql.*;
+
 public class AdminController {
 
-    @FXML
-    private TextArea answerKeyField;
+    // Input Data Siswa
+    @FXML private TextField nrpField;
+    @FXML private TextField namaField;
+    @FXML private DatePicker tglLahirPicker;
+    @FXML private TextField alamatField;
+    @FXML private TextField noHpOrtuField;
+    @FXML private PasswordField passwordField;
+
+    // Input Jadwal Kelas
+    @FXML private ComboBox<String> kelasCombo;
+    @FXML private ComboBox<String> hariCombo;
+    @FXML private TextField jamField;
+    @FXML private ComboBox<String> guruCombo;
+    @FXML private ComboBox<String> mapelCombo;
+
+    // Bagi/Naik Kelas
+    @FXML private ComboBox<String> siswaCombo;
+    @FXML private ComboBox<String> kelasTujuanCombo;
+    @FXML private ComboBox<String> waliKelasCombo;
 
     @FXML
-    private ListView<Assignment> assignmentList = new ListView<>();
+    public void initialize() {
+        hariCombo.getItems().addAll("Senin", "Selasa", "Rabu", "Kamis", "Jumat");
 
-    @FXML
-    private TextField idField;
-
-    @FXML
-    private TextArea instructionsField;
-
-    @FXML
-    private TextField nameField;
-
-    private final ObservableList<Assignment> assignments = FXCollections.observableArrayList();
-
-    @FXML
-    void initialize() {
-        // Set idField to read-only
-        idField.setEditable(false);
-        idField.setMouseTransparent(true);
-        idField.setFocusTraversable(false);
-
-        // Populate the ListView with assignment names
-        refreshAssignmentList();
-
-        assignmentList.setCellFactory(param -> new ListCell<Assignment>() {
-            @Override
-            protected void updateItem(Assignment item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item.name);
-                }
-            }
-
-            // Bind the onAssignmentSelected method to the ListView
-            @Override
-            public void updateSelected(boolean selected) {
-                super.updateSelected(selected);
-                if (selected) {
-                    onAssignmentSelected(getItem());
-                }
-            }
-        });
+        // TODO: Load data into combo boxes from DB
+        loadComboData();
     }
 
-    void refreshAssignmentList() {
-        // Clear the current list
-        assignments.clear();
+    private void loadComboData() {
+        try (Connection conn = MainDataSource.getConnection()) {
+            Statement stmt = conn.createStatement();
 
-        // Re-populate the ListView with assignment names
-        try (Connection c = MainDataSource.getConnection()) {
-            Statement stmt = c.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM assignments");
-
-            while (rs.next()) {
-                // Create a new assignment object
-                assignments.addAll(new Assignment(rs));
-            }
-        } catch (Exception e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("Database Error");
-            alert.setContentText(e.toString());
-        }
-
-        // Set the ListView to display assignment names
-        assignmentList.setItems(assignments);
-
-        // Set currently selected to the id inside the id field
-        // This is inefficient, you can optimize this.
-        try {
-            if (!idField.getText().isEmpty()) {
-                long id = Long.parseLong(idField.getText());
-                for (Assignment assignment : assignments) {
-                    if (assignment.id == id) {
-                        assignmentList.getSelectionModel().select(assignment);
-                        break;
-                    }
-                }
-            }
-        } catch (NumberFormatException e) {
-            // Ignore, idField is empty
-        }
-    }
-
-    void onAssignmentSelected(Assignment assignment) {
-        // Set the id field
-        idField.setText(String.valueOf(assignment.id));
-
-        // Set the name field
-        nameField.setText(assignment.name);
-
-        // Set the instructions field
-        instructionsField.setText(assignment.instructions);
-
-        // Set the answer key field
-        answerKeyField.setText(assignment.answerKey);
-    }
-
-    @FXML
-    void onNewAssignmentClick(ActionEvent event) {
-        // Clear the contents of the id field
-        idField.clear();
-
-        // Clear the contents of all text fields
-        nameField.clear();
-        instructionsField.clear();
-        answerKeyField.clear();
-    }
-
-
-
-    @FXML
-    void onSaveClick(ActionEvent event) {
-        // If id is set, update, else insert
-        if (idField.getText().isEmpty()) {
-            // Insert new assignment
-            try (Connection c = MainDataSource.getConnection()) {
-                PreparedStatement stmt = c.prepareStatement("INSERT INTO assignments (name, instructions, answer_key) VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-                stmt.setString(1, nameField.getText());
-                stmt.setString(2, instructionsField.getText());
-                stmt.setString(3, answerKeyField.getText());
-                stmt.executeUpdate();
-
-                ResultSet rs = stmt.getGeneratedKeys();
-                if (rs.next()) {
-                    // Get generated id, update idField
-                    idField.setText(String.valueOf(rs.getLong(1)));
-                }
-            } catch (Exception e) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText("Database Error");
-                alert.setContentText(e.toString());
-            }
-        } else {
-            // Update existing assignment
-            try (Connection c = MainDataSource.getConnection()) {
-                PreparedStatement stmt = c.prepareStatement("UPDATE assignments SET name = ?, instructions = ?, answer_key = ? WHERE id = ?");
-                stmt.setString(1, nameField.getText());
-                stmt.setString(2, instructionsField.getText());
-                stmt.setString(3, answerKeyField.getText());
-                stmt.setInt(4, Integer.parseInt(idField.getText()));
-                stmt.executeUpdate();
-            } catch (Exception e) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText("Database Error");
-                alert.setContentText(e.toString());
-            }
-        }
-
-        // Refresh the assignment list
-        refreshAssignmentList();
-    }
-
-    @FXML
-    void onShowGradesClick(ActionEvent event) {
-        if (idField.getText().isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("No Assignment Selected");
-            alert.setContentText("Please select an assignment to view grades.");
-            alert.showAndWait();
-            return;
-        }
-
-        long assignmentId = Long.parseLong(idField.getText());
-
-        TableView<ArrayList<String>> tableView = new TableView<>();
-        ObservableList<ArrayList<String>> data = FXCollections.observableArrayList();
-        ArrayList<String> headers = new ArrayList<>();
-
-        try (Connection conn = MainDataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT u.username, g.grade FROM grades g JOIN users u ON g.user_id = u.id WHERE g.assignment_id = ?"
-             )) {
-            stmt.setLong(1, assignmentId);
-            ResultSet rs = stmt.executeQuery();
-            ResultSetMetaData metaData = rs.getMetaData();
-            int columnCount = metaData.getColumnCount();
-
-            for (int i = 1; i <= columnCount; i++) {
-                final int columnIndex = i - 1;
-                String headerText = metaData.getColumnLabel(i);
-                headers.add(headerText);
-
-                TableColumn<ArrayList<String>, String> column = new TableColumn<>(headerText);
-                column.setCellValueFactory(cellData -> {
-                    ArrayList<String> rowData = cellData.getValue();
-                    if (rowData != null && columnIndex < rowData.size()) {
-                        return new SimpleStringProperty(rowData.get(columnIndex));
-                    } else {
-                        return new SimpleStringProperty("");
-                    }
-                });
-                column.setPrefWidth(150);
-                tableView.getColumns().add(column);
+            ResultSet rsKelas = stmt.executeQuery("SELECT nama_kelas FROM kelas");
+            while (rsKelas.next()) {
+                kelasCombo.getItems().add(rsKelas.getString(1));
+                kelasTujuanCombo.getItems().add(rsKelas.getString(1));
             }
 
-            while (rs.next()) {
-                ArrayList<String> row = new ArrayList<>();
-                for (int i = 1; i <= columnCount; i++) {
-                    String value = rs.getString(i);
-                    row.add(value != null ? value : "");
-                }
-                data.add(row);
+            ResultSet rsGuru = stmt.executeQuery("SELECT nama_guru FROM guru");
+            while (rsGuru.next()) {
+                guruCombo.getItems().add(rsGuru.getString(1));
+                waliKelasCombo.getItems().add(rsGuru.getString(1));
             }
 
-            if (data.isEmpty()) {
-                Alert infoAlert = new Alert(Alert.AlertType.INFORMATION);
-                infoAlert.setTitle("No Grades");
-                infoAlert.setHeaderText(null);
-                infoAlert.setContentText("There are no grades submitted for this assignment yet.");
-                infoAlert.showAndWait();
-                return;
+            ResultSet rsMapel = stmt.executeQuery("SELECT nama_mapel FROM mata_pelajaran");
+            while (rsMapel.next()) {
+                mapelCombo.getItems().add(rsMapel.getString(1));
             }
 
-            tableView.setItems(data);
-            StackPane root = new StackPane(tableView);
-            Scene scene = new Scene(root, 400, 300);
-            Stage stage = new Stage();
-            stage.setTitle("Grades for Assignment ID: " + assignmentId);
-            stage.setScene(scene);
-            stage.show();
+            ResultSet rsSiswa = stmt.executeQuery("SELECT nama_siswa FROM siswa");
+            while (rsSiswa.next()) {
+                siswaCombo.getItems().add(rsSiswa.getString(1));
+            }
 
         } catch (SQLException e) {
             e.printStackTrace();
-            Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-            errorAlert.setTitle("Database Error");
-            errorAlert.setHeaderText("Could not retrieve grades.");
-            errorAlert.setContentText(e.getMessage());
-            errorAlert.showAndWait();
         }
     }
 
-
     @FXML
-    void onTestButtonClick(ActionEvent event) {
-        // Display a window containing the results of the query.
+    private void handleSimpanSiswa() {
+        String nrpText = nrpField.getText();
+        String nama = namaField.getText();
+        LocalDate tglLahir = tglLahirPicker.getValue();
+        String alamat = alamatField.getText();
+        String noHpOrtu = noHpOrtuField.getText();
+        String password = passwordField.getText();
 
-        // Create a new window/stage
-        Stage stage = new Stage();
-        stage.setTitle("Query Results");
+        String sql = "INSERT INTO siswa (nrp, nama_siswa, tgl_lahir, alamat, no_hp_ortu, password) VALUES (?, ?, ?, ?, ?, ?)";
 
-        // Display in a table view.
-        TableView<ArrayList<String>> tableView = new TableView<>();
+        try (Connection conn = MainDataSource.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-        ObservableList<ArrayList<String>> data = FXCollections.observableArrayList();
-        ArrayList<String> headers = new ArrayList<>(); // To check if any columns were returned
+            pstmt.setInt(1, Integer.parseInt(nrpText));
+            pstmt.setString(2, nama);
+            pstmt.setDate(3, Date.valueOf(tglLahir));
+            pstmt.setString(4, alamat);
+            pstmt.setString(5, noHpOrtu);
+            pstmt.setString(6, password);
+            pstmt.executeUpdate();
 
-        // Use try-with-resources for automatic closing of Connection, Statement, ResultSet
-        try (Connection conn = GradingDataSource.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(answerKeyField.getText())) {
-
-            ResultSetMetaData metaData = rs.getMetaData();
-            int columnCount = metaData.getColumnCount();
-
-            // 1. Get Headers and Create Table Columns
-            for (int i = 1; i <= columnCount; i++) {
-                final int columnIndex = i - 1; // Need final variable for lambda (0-based index for ArrayList)
-                String headerText = metaData.getColumnLabel(i); // Use label for potential aliases
-                headers.add(headerText); // Keep track of headers
-
-                TableColumn<ArrayList<String>, String> column = new TableColumn<>(headerText);
-
-                // Define how to get the cell value for this column from an ArrayList<String> row object
-                column.setCellValueFactory(cellData -> {
-                    ArrayList<String> rowData = cellData.getValue();
-                    // Ensure rowData exists and the index is valid before accessing
-                    if (rowData != null && columnIndex < rowData.size()) {
-                        return new SimpleStringProperty(rowData.get(columnIndex));
-                    } else {
-                        return new SimpleStringProperty(""); // Should not happen with current logic, but safe fallback
-                    }
-                });
-                column.setPrefWidth(120); // Optional: set a preferred width
-                tableView.getColumns().add(column);
-            }
-
-            // 2. Get Data Rows
-            while (rs.next()) {
-                ArrayList<String> row = new ArrayList<>();
-                for (int i = 1; i <= columnCount; i++) {
-                    // Retrieve all data as String. Handle NULLs gracefully.
-                    String value = rs.getString(i);
-                    row.add(value != null ? value : ""); // Add empty string for SQL NULL
-                }
-                data.add(row);
-            }
-
-            // 3. Check if any results (headers or data) were actually returned
-            if (headers.isEmpty() && data.isEmpty()) {
-                // Handle case where query might be valid but returns no results
-                Alert infoAlert = new Alert(Alert.AlertType.INFORMATION);
-                infoAlert.setTitle("Query Results");
-                infoAlert.setHeaderText(null);
-                infoAlert.setContentText("The query executed successfully but returned no data.");
-                infoAlert.showAndWait();
-                return; // Exit the method, don't show the empty table window
-            }
-
-            // 4. Set the data items into the table
-            tableView.setItems(data);
-
-            // 5. Create layout and scene
-            StackPane root = new StackPane();
-            root.getChildren().add(tableView);
-            Scene scene = new Scene(root, 800, 600); // Adjust size as needed
-
-            // 6. Set scene and show stage
-            stage.setScene(scene);
-            stage.show();
+            System.out.println("Data siswa berhasil disimpan.");
 
         } catch (SQLException e) {
-            // Log the error and show an alert to the user
-            e.printStackTrace(); // Print stack trace to console/log for debugging
-            Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-            errorAlert.setTitle("Database Error");
-            errorAlert.setHeaderText("Failed to execute query or retrieve results.");
-            errorAlert.setContentText("SQL Error: " + e.getMessage());
-            errorAlert.showAndWait();
-        } catch (Exception e) {
-            // Catch other potential exceptions (e.g., class loading if driver not found)
-            e.printStackTrace(); // Print stack trace to console/log for debugging
-            Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-            errorAlert.setTitle("Error");
-            errorAlert.setHeaderText("An unexpected error occurred.");
-            errorAlert.setContentText(e.getMessage());
-            errorAlert.showAndWait();
+            e.printStackTrace();
         }
-    } // End of onTestButtonClick method
-
-
-    @FXML
-    void onDeleteAssignmentClick(ActionEvent event) {
-        if (idField.getText().isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("No Assignment Selected");
-            alert.setContentText("Please select an assignment to delete.");
-            alert.showAndWait();
-            return;
-        }
-
-        long assignmentId = Long.parseLong(idField.getText());
-
-        Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmationAlert.setTitle("Confirm Deletion");
-        confirmationAlert.setHeaderText("Are you sure you want to delete this assignment?");
-        confirmationAlert.setContentText("This action cannot be undone.");
-        confirmationAlert.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.OK) {
-                try (Connection conn = MainDataSource.getConnection()) {
-                    String deleteQuery = "DELETE FROM assignments WHERE id = ?";
-                    PreparedStatement stmt = conn.prepareStatement(deleteQuery);
-                    stmt.setLong(1, assignmentId);
-                    stmt.executeUpdate();
-
-                    refreshAssignmentList();
-
-                    idField.clear();
-                    nameField.clear();
-                    instructionsField.clear();
-                    answerKeyField.clear();
-
-                    Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
-                    successAlert.setTitle("Success");
-                    successAlert.setHeaderText("Assignment Deleted");
-                    successAlert.setContentText("The assignment has been successfully deleted.");
-                    successAlert.showAndWait();
-
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                    Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-                    errorAlert.setTitle("Database Error");
-                    errorAlert.setHeaderText("Failed to delete assignment");
-                    errorAlert.setContentText(e.getMessage());
-                    errorAlert.showAndWait();
-                }
-            }
-        });
     }
 
+    @FXML
+    private void handleSimpanJadwal() {
+        String kelas = kelasCombo.getValue();
+        String hari = hariCombo.getValue();
+        String jam = jamField.getText();
+        String guru = guruCombo.getValue();
+        String mapel = mapelCombo.getValue();
 
+        String sql = "INSERT INTO jadwal_kelas (hari, jam, id_kelas, nip_guru, id_mapel) VALUES (?, ?, (SELECT id_kelas FROM kelas WHERE nama_kelas = ?),(SELECT nip_guru FROM guru WHERE nama_guru = ?),(SELECT id_mapel FROM mata_pelajaran WHERE nama_mapel = ?))";
+
+        try (Connection conn = MainDataSource.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, hari);
+            pstmt.setString(2, jam);
+            pstmt.setString(3, kelas);
+            pstmt.setString(4, guru);
+            pstmt.setString(5, mapel);
+            pstmt.executeUpdate();
+
+            System.out.println("Jadwal kelas berhasil disimpan.");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void handlePindahKelas() {
+        String siswa = siswaCombo.getValue();
+        String kelasTujuan = kelasTujuanCombo.getValue();
+        String waliKelas = waliKelasCombo.getValue();
+
+        try (Connection conn = MainDataSource.getConnection()) {
+            conn.setAutoCommit(false);
+
+            // Update siswa_kelas
+            String insertSK = "INSERT INTO siswa_kelas (nrp, id_kelas) VALUES ((SELECT nrp FROM siswa WHERE nama_siswa = ?), (SELECT id_kelas FROM kelas WHERE nama_kelas = ?))";
+            try (PreparedStatement psSk = conn.prepareStatement(insertSK)) {
+                psSk.setString(1, siswa);
+                psSk.setString(2, kelasTujuan);
+                psSk.executeUpdate();
+            }
+
+            // Update wali kelas
+            String updateWali = "UPDATE kelas SET nip_wali = (SELECT nip_guru FROM guru WHERE nama_guru = ?) WHERE nama_kelas = ?";
+            try (PreparedStatement psWk = conn.prepareStatement(updateWali)) {
+                psWk.setString(1, waliKelas);
+                psWk.setString(2, kelasTujuan);
+                psWk.executeUpdate();
+            }
+
+            conn.commit();
+            System.out.println("Siswa berhasil dipindahkan ke kelas baru dan wali kelas diset.");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
+
