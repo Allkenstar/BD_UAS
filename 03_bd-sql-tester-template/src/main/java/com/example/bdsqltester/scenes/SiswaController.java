@@ -147,7 +147,7 @@ public class SiswaController {
         nilaiTab.setItems(data);
     }
 
-    // DTO untuk Jadwal
+
     public static class JadwalItem {
         private final int idJadwal;
         private final String hari, jam, kelas, guru, semester, tahun, mapel;
@@ -174,7 +174,7 @@ public class SiswaController {
         public String getMapel() { return mapel; }
     }
 
-    // DTO untuk Nilai
+
     public static class NilaiItem {
         private final int idNilai;
         private final String tanggal, ujian, mapel;

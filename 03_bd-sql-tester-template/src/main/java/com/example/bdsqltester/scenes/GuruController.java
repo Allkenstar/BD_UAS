@@ -33,7 +33,6 @@ public class GuruController {
 
     public void setUserId(int userId) {
         this.userId = userId;
-        loadJadwalKelas();
     }
 
     public void setNameId(String nameId) {
@@ -50,6 +49,7 @@ public class GuruController {
         colJam.setCellValueFactory(new PropertyValueFactory<>("jam"));
         colKelas.setCellValueFactory(new PropertyValueFactory<>("kelas"));
         colMapel.setCellValueFactory(new PropertyValueFactory<>("mataPelajaran"));
+        loadJadwalKelas();
     }
 
     private void loadJadwalKelas() {
@@ -107,7 +107,7 @@ public class GuruController {
                 return;
             }
 
-            String mapel = colMapel.getCellObservableValue(selected).getValue();
+            String mapel = selected.getMataPelajaran();
 
 
             String getIdMapelQuery = "SELECT id_mapel FROM mata_pelajaran WHERE nama_mapel = ?";
