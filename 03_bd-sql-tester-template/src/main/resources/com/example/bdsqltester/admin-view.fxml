@@ -13,9 +13,12 @@
    <center>
       <TabPane>
 
-<!--          Input Data Siswa -->
+         <!-- Input Data Siswa -->
          <Tab text="Input Data Siswa">
-            <VBox spacing="10" padding="20">
+            <VBox spacing="10">
+               <padding>
+                  <Insets top="20" right="20" bottom="20" left="20"/>
+               </padding>
                <TextField fx:id="nrpField" promptText="Nomor Induk (NRP)"/>
                <TextField fx:id="namaField" promptText="Nama Siswa"/>
                <DatePicker fx:id="tglLahirPicker" promptText="Tanggal Lahir"/>
@@ -28,7 +31,10 @@
 
          <!-- Input Jadwal Kelas -->
          <Tab text="Input Jadwal Kelas">
-            <VBox spacing="10" padding="20">
+            <VBox spacing="10">
+               <padding>
+                  <Insets top="20" right="20" bottom="20" left="20"/>
+               </padding>
                <ComboBox fx:id="kelasCombo" promptText="Pilih Kelas"/>
                <ComboBox fx:id="hariCombo" promptText="Pilih Hari"/>
                <TextField fx:id="jamField" promptText="Jam (e.g. 07:00-08:30)"/>
@@ -38,9 +44,12 @@
             </VBox>
          </Tab>
 
-         <!--  Bagi Kelas / Naik Kelas -->
+         <!-- Bagi Kelas / Naik Kelas -->
          <Tab text="Bagi/Naik Kelas">
-            <VBox spacing="10" padding="20">
+            <VBox spacing="10">
+               <padding>
+                  <Insets top="20" right="20" bottom="20" left="20"/>
+               </padding>
                <ComboBox fx:id="siswaCombo" promptText="Pilih Siswa"/>
                <ComboBox fx:id="kelasTujuanCombo" promptText="Pilih Kelas Tujuan"/>
                <ComboBox fx:id="waliKelasCombo" promptText="Pilih Wali Kelas"/>
