@@ -1,25 +1,12 @@
 package com.example.bdsqltester.scenes;
 
-import com.example.bdsqltester.datasources.GradingDataSource;
 import com.example.bdsqltester.datasources.MainDataSource;
-import com.example.bdsqltester.dtos.Assignment;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.StackPane;
-import javafx.stage.Stage;
 
 import java.sql.*;
-import java.util.ArrayList;
 
-import javafx.fxml.FXML;
-import javafx.scene.control.*;
 import java.time.LocalDate;
-import java.sql.*;
 
 public class AdminController {
 
@@ -91,7 +78,7 @@ public class AdminController {
         String noHpOrtu = noHpOrtuField.getText();
         String password = passwordField.getText();
 
-        String sql = "INSERT INTO siswa (nrp, nama_siswa, tgl_lahir, alamat, no_hp_ortu, password) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO siswa (nrp, nama_siswa, tgl_lahir, alamat, no_hp_ortu, password) VALUES (?, ?, ?, ?, ?, ?); INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
 
         try (Connection conn = MainDataSource.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -102,6 +89,11 @@ public class AdminController {
             pstmt.setString(4, alamat);
             pstmt.setString(5, noHpOrtu);
             pstmt.setString(6, password);
+
+            pstmt.setString(7, nrpText);
+            pstmt.setString(8, password);
+            pstmt.setString(9, "siswa");
+
             pstmt.executeUpdate();
 
             System.out.println("Data siswa berhasil disimpan.");

@@ -73,8 +73,8 @@ public class LoginController {
 
     @FXML
     void initialize() {
-        selectRole.getItems().addAll("admin", "user", "guru", "wali_kelas");
-        selectRole.setValue("user");
+        selectRole.getItems().addAll("admin", "siswa", "guru", "wali_kelas");
+        selectRole.setValue("siswa");
     }
 
     @FXML
@@ -111,7 +111,7 @@ public class LoginController {
                         app.getPrimaryStage().setTitle("Admin View");
                         break;
 
-                    case "user":
+                    case "siswa":
                         loader = new FXMLLoader(HelloApplication.class.getResource("siswa-view.fxml"));
                         root = loader.load();
                         SiswaController siswaController = loader.getController();
