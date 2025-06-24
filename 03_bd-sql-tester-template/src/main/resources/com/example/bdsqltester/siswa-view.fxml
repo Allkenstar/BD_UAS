@@ -1,20 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.bdsqltester.scenes.SiswaController">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.bdsqltester.scenes.SiswaController">
     <children>
         <TabPane prefHeight="407.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE">
             <tabs>
-                <Tab text="Biodata Siswa">
+                <Tab fx:id="bioTab" text="Biodata Siswa">
                     <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="368.0" prefWidth="600.0">
                             <children>
@@ -23,7 +17,7 @@
                                         <Font name="System Bold" size="16.0" />
                                     </font>
                                 </Label>
-                                <TextField editable="false" layoutX="155.0" layoutY="46.0" prefHeight="30.0" prefWidth="360.0">
+                                <TextField fx:id="nrpLable" editable="false" layoutX="155.0" layoutY="46.0" prefHeight="30.0" prefWidth="360.0">
                                     <font>
                                         <Font size="14.0" />
                                     </font>
@@ -38,7 +32,7 @@
                                         <Font size="14.0" />
                                     </font>
                                 </Label>
-                                <TextField editable="false" layoutX="155.0" layoutY="81.0" prefHeight="30.0" prefWidth="360.0">
+                                <TextField fx:id="namaLable" editable="false" layoutX="155.0" layoutY="81.0" prefHeight="30.0" prefWidth="360.0">
                                     <font>
                                         <Font size="14.0" />
                                     </font>
@@ -48,7 +42,7 @@
                                         <Font size="14.0" />
                                     </font>
                                 </Label>
-                                <TextField editable="false" layoutX="155.0" layoutY="116.0" prefHeight="30.0" prefWidth="360.0">
+                                <TextField fx:id="tglLable" editable="false" layoutX="155.0" layoutY="116.0" prefHeight="30.0" prefWidth="360.0">
                                     <font>
                                         <Font size="14.0" />
                                     </font>
@@ -58,12 +52,12 @@
                                         <Font size="14.0" />
                                     </font>
                                 </Label>
-                                <TextField editable="false" layoutX="155.0" layoutY="151.0" prefHeight="60.0" prefWidth="360.0">
+                                <TextField fx:id="almtLable" editable="false" layoutX="155.0" layoutY="151.0" prefHeight="60.0" prefWidth="360.0">
                                     <font>
                                         <Font size="14.0" />
                                     </font>
                                 </TextField>
-                                <TextField editable="false" layoutX="155.0" layoutY="217.0" prefHeight="30.0" prefWidth="360.0">
+                                <TextField fx:id="noLable" editable="false" layoutX="155.0" layoutY="217.0" prefHeight="30.0" prefWidth="360.0">
                                     <font>
                                         <Font size="14.0" />
                                     </font>
@@ -86,16 +80,16 @@
                                         <Font name="System Bold" size="16.0" />
                                     </font>
                                 </Label>
-                                <TableView layoutX="21.0" layoutY="48.0" prefHeight="302.0" prefWidth="558.0">
+                                <TableView fx:id="jadwalTab" layoutX="21.0" layoutY="48.0" prefHeight="302.0" prefWidth="558.0">
                                     <columns>
-                                        <TableColumn prefWidth="64.44442749023438" text="ID Jadwal" />
-                                        <TableColumn prefWidth="63.111053466796875" text="Hari" />
-                                        <TableColumn prefWidth="72.4444580078125" text="Jam" />
-                                        <TableColumn prefWidth="56.888916015625" text="Kelas" />
-                                        <TableColumn prefWidth="54.22216796875" text="Guru" />
-                                        <TableColumn prefWidth="75.55548095703125" text="Semester" />
-                                        <TableColumn minWidth="0.0" prefWidth="89.77777099609375" text="Tahun Ajaran" />
-                                        <TableColumn prefWidth="75.0" text="Mapel" />
+                                        <TableColumn fx:id="idJadwalColumn" prefWidth="64.44442749023438" text="ID Jadwal" />
+                                        <TableColumn fx:id="hariColumn" prefWidth="63.111053466796875" text="Hari" />
+                                        <TableColumn fx:id="jamColumn" prefWidth="72.4444580078125" text="Jam" />
+                                        <TableColumn fx:id="kelasColumn" prefWidth="56.888916015625" text="Kelas" />
+                                        <TableColumn fx:id="guruColumn" prefWidth="54.22216796875" text="Guru" />
+                                        <TableColumn fx:id="semesterColumn" prefWidth="75.55548095703125" text="Semester" />
+                                        <TableColumn fx:id="tahunColumn" minWidth="0.0" prefWidth="89.77777099609375" text="Tahun Ajaran" />
+                                        <TableColumn fx:id="mapelColumn" prefWidth="75.0" text="Mapel" />
                                     </columns>
                                 </TableView>
                             </children>
@@ -111,13 +105,13 @@
                                         <Font name="System Bold" size="16.0" />
                                     </font>
                                 </Label>
-                                <TableView layoutX="21.0" layoutY="48.0" prefHeight="302.0" prefWidth="558.0">
+                                <TableView fx:id="nilaiTab" layoutX="21.0" layoutY="48.0" prefHeight="302.0" prefWidth="558.0">
                                     <columns>
-                                        <TableColumn prefWidth="64.44442749023438" text="ID Nilai" />
-                                        <TableColumn prefWidth="63.111053466796875" text="Tanggal" />
-                                        <TableColumn prefWidth="72.4444580078125" text="Jenis Ujian" />
-                                        <TableColumn prefWidth="56.888916015625" text="Nilai" />
-                                        <TableColumn prefWidth="54.22216796875" text="Mapel" />
+                                        <TableColumn fx:id="idNilaiColumn" prefWidth="64.44442749023438" text="ID Nilai" />
+                                        <TableColumn fx:id="tanggalColumn" prefWidth="63.111053466796875" text="Tanggal" />
+                                        <TableColumn fx:id="ujianColumn" prefWidth="72.4444580078125" text="Jenis Ujian" />
+                                        <TableColumn fx:id="nilaiColumn" prefWidth="56.888916015625" text="Nilai" />
+                                        <TableColumn fx:id="mapelNilaiColumn" prefWidth="54.22216796875" text="Mapel" />
                                     </columns>
                                 </TableView>
                             </children>

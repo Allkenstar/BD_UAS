@@ -10,8 +10,7 @@ public class Jadwal {
     public String mataPelajaran;
     public String kelas;
 
-    public Jadwal(long id,String hari, String jam,String mataPelajaran,String kelas)
-    {
+    public Jadwal(long id,String hari, String jam,String mataPelajaran,String kelas) {
         this.id =id;
         this.hari = hari;
         this.jam = jam;
