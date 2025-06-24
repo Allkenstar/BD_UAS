@@ -19,6 +19,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+
+
 public class LoginController {
 
     @FXML
@@ -125,6 +127,7 @@ public class LoginController {
                         root = loader.load();
                         GuruController guruController = loader.getController();
                         guruController.setUserId(userId); // create setter
+                        guruController.setNameId(username);
                         scene = new Scene(root);
                         app.getPrimaryStage().setTitle("Guru View");
                         break;

@@ -19,10 +19,10 @@ public class WaliController {
         ObservableList<String> nilaiData = FXCollections.observableArrayList();
         try (Connection conn = MainDataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT m.nama as mata_pelajaran, n.nilai " +
+                     "SELECT m.nama_mapel as mata_pelajaran, n.nilai " +
                              "FROM nilai_ujian n " +
-                             "JOIN mata_pelajaran m ON n.mata_pelajaran_id = m.id " +
-                             "WHERE n.siswa_id = ?")) {
+                             "JOIN mata_pelajaran m ON n.id_mapel = m.id_mapel " +
+                             "WHERE n.nrp = ?")) {
             stmt.setLong(1, Long.parseLong(siswaIdField.getText()));
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {

@@ -1,15 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox spacing="10" xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.bdsqltester.scenes.GuruController">
-    <Label text="Jadwal Mengajar"/>
-    <TableView fx:id="jadwalTable" prefHeight="200"/>
+<?import javafx.geometry.Insets?>
 
-    <Label text="Input Nilai Ujian"/>
-    <HBox spacing="5">
-        <TextField fx:id="siswaIdField" promptText="ID Siswa"/>
-        <TextField fx:id="mapelIdField" promptText="ID Mapel"/>
-        <TextField fx:id="nilaiField" promptText="Nilai"/>
-        <Button text="Submit" fx:id="submitButton" onAction="#handleInputNilai"/>
-    </HBox>
-</VBox>
+<AnchorPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.bdsqltester.scenes.GuruController"
+            prefWidth="800.0" prefHeight="600.0">
+
+    <children>
+
+        <Label layoutX="20.0" layoutY="20.0" text="Jadwal Kelas Anda"
+               style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+
+        <TableView fx:id="tableJadwal" layoutX="20.0" layoutY="50.0" prefWidth="760.0" prefHeight="200.0">
+            <columns>
+                <TableColumn fx:id="colHari" text="Hari" prefWidth="100.0"/>
+                <TableColumn fx:id="colJam" text="Jam" prefWidth="150.0"/>
+                <TableColumn fx:id="colKelas" text="Kelas" prefWidth="150.0"/>
+                <TableColumn fx:id="colMapel" text="Mata Pelajaran" prefWidth="200.0"/>
+            </columns>
+        </TableView>
+
+        <Label layoutX="20.0" layoutY="270.0" text="Input Nilai Ujian"
+               style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+
+        <Label layoutX="20.0" layoutY="310.0" text="NRP Siswa:"/>
+        <TextField fx:id="fieldNRP" layoutX="150.0" layoutY="305.0" prefWidth="200.0"/>
+
+        <Label layoutX="20.0" layoutY="350.0" text="Jenis Ujian:"/>
+        <ComboBox fx:id="comboJenisUjian" layoutX="150.0" layoutY="345.0" prefWidth="200.0"/>
+
+        <Label layoutX="20.0" layoutY="390.0" text="Nilai:"/>
+        <TextField fx:id="fieldNilai" layoutX="150.0" layoutY="385.0" prefWidth="200.0"/>
+
+        <Label layoutX="20.0" layoutY="430.0" text="Start Date:"/>
+        <DatePicker fx:id="pickerStartDate" layoutX="150.0" layoutY="425.0" prefWidth="200.0"/>
+
+        <Label layoutX="20.0" layoutY="470.0" text="End Date:"/>
+        <DatePicker fx:id="pickerEndDate" layoutX="150.0" layoutY="465.0" prefWidth="200.0"/>
+
+        <Button fx:id="btnSubmitNilai" layoutX="150.0" layoutY="510.0" text="Simpan Nilai" />
+
+    </children>
+</AnchorPane>
