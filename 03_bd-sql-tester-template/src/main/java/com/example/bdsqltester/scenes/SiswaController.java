@@ -1,34 +1,39 @@
 package com.example.bdsqltester.scenes;
 
 import com.example.bdsqltester.datasources.MainDataSource;
-import com.example.bdsqltester.dtos.Assignment;
+import com.example.bdsqltester.dtos.Grade;
+import com.example.bdsqltester.dtos.Jadwal;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class SiswaController {
-    @FXML
-    private ListView<Assignment> assignmentList;
-    @FXML private TextField idField;
-    @FXML private TextField nameField;
-    @FXML private TextArea instructionsField;
-    @FXML private TextArea answerKeyField;
-    @FXML private TextArea userQueryArea;
-    @FXML private Label gradeLabel;
 
-    Connection connection = MainDataSource.getConnection();
+    @FXML private Label namaLabel;
+    @FXML private Label tglLahirLabel;
+    @FXML private Label alamatLabel;
+    @FXML private Label noHpOrtuLabel;
+
+    @FXML private TableView<Jadwal> jadwalTable;
+    @FXML private TableColumn<Jadwal, String> hariColumn;
+    @FXML private TableColumn<Jadwal, String> jamColumn;
+    @FXML private TableColumn<Jadwal, String> mapelColumn;
+    @FXML private TableColumn<Jadwal, String> guruColumn;
+
+    @FXML private TableView<Grade> nilaiTable;
+    @FXML private TableColumn<Grade, String> jenisUjianColumn;
+    @FXML private TableColumn<Grade, Integer> nilaiColumn;
+    @FXML private TableColumn<Grade, String> mapelNilaiColumn;
+
     private int userId;
-
-    public SiswaController() throws SQLException {
-    }
-
 
     public void setUserId(int id) {
         this.userId = id;
@@ -36,177 +41,85 @@ public class SiswaController {
 
     @FXML
     public void initialize() {
-        if (connection == null) {
-            showAlert("Error", "Database connection is not established.");
-            return;
-        }
-        loadAssignments();
-        assignmentList.setOnMouseClicked(this::onAssignmentSelected);
-
+        loadBiodata();
+        loadJadwal();
+        loadNilai();
     }
 
-    private void loadAssignments() {
-        ObservableList<Assignment> assignments = FXCollections.observableArrayList();
-        try {
-            if (connection == null) {
-                showAlert("Error", "Database connection is not available.");
-                return;
-            }
 
-            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM assignments ORDER BY id");
+
+//    private int userId;
+//
+//    public void setUserId(int userId) {
+//        this.userId = userId;
+//        this.currentNrp = userId;
+//        loadBiodata();
+//        loadJadwal();
+//        loadNilai();
+//    }
+
+    private void loadBiodata() {
+        String sql = "SELECT nama_siswa, tgl_lahir, alamat, no_hp_ortu FROM siswa WHERE nrp = ?";
+        try (Connection conn = MainDataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
             ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                namaLabel.setText(rs.getString("nama_siswa"));
+                tglLahirLabel.setText(rs.getString("tgl_lahir"));
+                alamatLabel.setText(rs.getString("alamat"));
+                noHpOrtuLabel.setText(rs.getString("no_hp_ortu"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
+    private void loadJadwal() {
+        ObservableList<Jadwal> list = FXCollections.observableArrayList();
+        String sql = """
+                SELECT jk.hari, jk.jam, mp.nama_mapel, g.nama_guru
+                FROM siswa_kelas sk
+                JOIN kelas k ON sk.id_kelas = k.id_kelas
+                JOIN jadwal_kelas jk ON jk.id_kelas = k.id_kelas
+                JOIN mata_pelajaran mp ON jk.id_mapel = mp.id_mapel
+                JOIN guru g ON jk.nip_guru = g.nip_guru
+                WHERE sk.nrp = ?
+                """;
+        try (Connection conn = MainDataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                assignments.add(new Assignment(rs));
+                Jadwal jadwal = new Jadwal(rs);
+                list.add(jadwal);
             }
 
-            assignmentList.setItems(assignments);
-
+            jadwalTable.setItems(list);
         } catch (SQLException e) {
-            showAlert("Error", "Failed to load assignments: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-
-
-    private void onAssignmentSelected(MouseEvent event) {
-        Assignment selected = assignmentList.getSelectionModel().getSelectedItem();
-        if (selected == null) return;
-
-        idField.setText(String.valueOf(selected.id));
-        nameField.setText(selected.name);
-        instructionsField.setText(selected.instructions);
-        answerKeyField.setText(selected.answerKey);
-        loadUserGrade((int) selected.id);
-    }
-
-
-    private void loadUserGrade(int assignmentId) {
-        try {
-            if (connection == null) {
-                showAlert("Error", "Database connection is not available.");
-                return;
-            }
-            PreparedStatement stmt = connection.prepareStatement("SELECT grade FROM grades WHERE assignment_id = ? AND user_id = ?");
-            stmt.setInt(1, assignmentId);
-            stmt.setInt(2, userId);
+    private void loadNilai() {
+        ObservableList<Grade> list = FXCollections.observableArrayList();
+        String sql = """
+                SELECT nu.jenis_ujian, nu.nilai, mp.nama_mapel
+                FROM nilai_ujian nu
+                JOIN mata_pelajaran mp ON nu.id_mapel = mp.id_mapel
+                WHERE nu.nrp = ?
+                """;
+        try (Connection conn = MainDataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
             ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                gradeLabel.setText("Score: " + rs.getInt("grade"));
-            } else {
-                gradeLabel.setText("Score: -");
+            while (rs.next()) {
+                Grade grade = new Grade(rs);
+                list.add(grade);
             }
+            nilaiTable.setItems(list);
         } catch (SQLException e) {
-            showAlert("Error", "Failed to load grade: " + e.getMessage());
             e.printStackTrace();
         }
-    }
-
-    @FXML
-    void onTestButtonClick() {
-        String query = userQueryArea.getText();
-        try {
-            if (connection == null) {
-                showAlert("Error", "Database connection is not available.");
-                return;
-            }
-            Statement stmt = connection.createStatement();
-            ResultSet rs = stmt.executeQuery(query);
-            String resultString = resultSetToString(rs);
-            showAlert("Query Output", resultString);
-        } catch (SQLException e) {
-            showAlert("Query Error", e.getMessage());
-        }
-    }
-
-    @FXML
-    void onSubmitClick() {
-        if (idField.getText().isEmpty()) {
-            showAlert("Error", "Please select an assignment first.");
-            return;
-        }
-
-        int assignmentId = Integer.parseInt(idField.getText());
-        String userQuery = userQueryArea.getText();
-        String answerQuery = answerKeyField.getText();
-
-        try {
-            if (connection == null) {
-                showAlert("Error", "Database connection is not available.");
-                return;
-            }
-            String userResult = resultSetToString(connection.createStatement().executeQuery(userQuery));
-            String answerResult = resultSetToString(connection.createStatement().executeQuery(answerQuery));
-
-            int grade;
-            if (userResult.equals(answerResult)) {
-                grade = 100;
-            } else if (sortLines(userResult).equals(sortLines(answerResult))) {
-                grade = 50;
-            } else {
-                grade = 0;
-            }
-
-            PreparedStatement checkStmt = connection.prepareStatement(
-                    "SELECT grade FROM grades WHERE assignment_id = ? AND user_id = ?"
-            );
-            checkStmt.setInt(1, assignmentId);
-            checkStmt.setInt(2, userId);
-            ResultSet rs = checkStmt.executeQuery();
-
-            if (rs.next()) {
-                int prevGrade = rs.getInt("grade");
-                if (grade > prevGrade) {
-                    PreparedStatement updateStmt = connection.prepareStatement(
-                            "UPDATE grades SET grade = ? WHERE assignment_id = ? AND user_id = ?"
-                    );
-                    updateStmt.setInt(1, grade);
-                    updateStmt.setInt(2, assignmentId);
-                    updateStmt.setInt(3, userId);
-                    updateStmt.executeUpdate();
-                }
-            } else {
-                PreparedStatement insertStmt = connection.prepareStatement(
-                        "INSERT INTO grades (assignment_id, user_id, grade) VALUES (?, ?, ?)"
-                );
-                insertStmt.setInt(1, assignmentId);
-                insertStmt.setInt(2, userId);
-                insertStmt.setInt(3, grade);
-                insertStmt.executeUpdate();
-            }
-
-            gradeLabel.setText("Score: " + grade);
-            showAlert("Submission Result", "You received a score of: " + grade);
-
-        } catch (SQLException e) {
-            showAlert("Error", e.getMessage());
-        }
-    }
-
-    private String resultSetToString(ResultSet rs) throws SQLException {
-        StringBuilder sb = new StringBuilder();
-        ResultSetMetaData md = rs.getMetaData();
-        int colCount = md.getColumnCount();
-        while (rs.next()) {
-            for (int i = 1; i <= colCount; i++) {
-                sb.append(rs.getString(i)).append("\t");
-            }
-            sb.append("\n");
-        }
-        return sb.toString().trim();
-    }
-
-    private String sortLines(String input) {
-        List<String> lines = new ArrayList<>(List.of(input.split("\n")));
-        lines.sort(String::compareTo);
-        return String.join("\n", lines);
-    }
-
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 }

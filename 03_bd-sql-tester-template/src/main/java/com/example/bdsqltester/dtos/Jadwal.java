@@ -10,6 +10,15 @@ public class Jadwal {
     public String mataPelajaran;
     public String kelas;
 
+    public Jadwal(long id,String hari, String jam,String mataPelajaran,String kelas)
+    {
+        this.id =id;
+        this.hari = hari;
+        this.jam = jam;
+        this. mataPelajaran = mataPelajaran;
+        this.kelas = kelas;
+    }
+
     public Jadwal(ResultSet rs) throws SQLException {
         this.id = rs.getLong("id");
         this.hari = rs.getString("hari");

@@ -22,7 +22,7 @@ public class GuruController {
 
     @FXML
     public void initialize() {
-        loadJadwalGuru(1); // contoh hardcoded guru_id = 1
+        loadJadwalGuru(userId);
     }
 
     public void setUserId(int id) {
