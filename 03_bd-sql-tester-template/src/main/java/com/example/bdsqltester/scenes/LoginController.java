@@ -115,7 +115,7 @@ public class LoginController {
                         loader = new FXMLLoader(HelloApplication.class.getResource("siswa-view.fxml"));
                         root = loader.load();
                         SiswaController siswaController = loader.getController();
-                        siswaController.setUserId(userId);
+                        siswaController.setUserId(Integer.parseInt(username));
                         scene = new Scene(root);
                         app.getPrimaryStage().setTitle("Siswa View");
                         break;
